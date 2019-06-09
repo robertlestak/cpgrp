@@ -1,0 +1,30 @@
+#!/bin/bash
+
+output_usage() {
+cat <<-EOF
+usage: $0 source_directory target_directory
+EOF
+}
+
+# cpgrp [src] [dst]
+main() {
+	SRC="$1"
+	DST="$2"
+	if [[ -z "$SRC" || -z "$DST" ]]; then
+		output_usage
+		exit 1
+	fi
+	SRT=($(ls "$SRC" | sort))
+	NMS=()
+	for f in ${SRT[@]}; do
+		NM=$(echo "$f" | sed 's,\..*$,,g')
+		NMS+=("$NM")
+	done
+	FNS=($(echo "${NMS[@]}" | tr ' ' '\n' | uniq | xargs))
+	for f in ${FNS[@]}; do
+		mkdir -p "$DST/$f"
+		cp -r "$SRC"/"$f"* "$DST/$f/"
+	done
+}
+
+main "$@"
